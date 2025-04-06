@@ -25,8 +25,13 @@ const config = {
 app.get('/users', async (req, res) => {
   try {
     await sql.connect(config);
-    const result = await sql.query`SELECT * FROM users`; // Replace with your actual table
-    res.json(result.recordset);
+    const result = await sql.query`SELECT * FROM users WHERE user_id="balaji" AND password="password"`; 
+    if(result!==null){
+      res.json(result.recordset);
+    }else{
+      res.json("No record Found")
+    }
+    
   } catch (err) {
     console.error('SQL error', err);
     res.status(500).send('Database error');

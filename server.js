@@ -29,15 +29,11 @@ sql.connect(config)
 // ✅ POST API to insert user
 app.post("/loginentry", async (req, res) => {
   const { uname, password } = req.body;
-
-  if (!uname || !password) {
-    return res.status(400).json({ success: false, message: "Username and password required" });
-  }
-
   try {
     const result = await sql.query`
       INSERT INTO users (user_id, password) 
       VALUES (${uname}, ${password})`;
+      console.log(`Values Update : ${uname}`);
 
     res.status(201).json({ success: true, message: "User inserted successfully" });
   } catch (err) {

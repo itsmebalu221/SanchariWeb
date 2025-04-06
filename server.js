@@ -21,16 +21,34 @@ const config = {
   },
 };
 
+// Connect once when server starts
+sql.connect(config)
+  .then(() => console.log('✅ Connected to Azure SQL Database'))
+  .catch(err => console.error('❌ SQL Connection Error:', err));
 
-app.post("/loginentry",async(req,res)=>{
-    const {uname,password}=req.body;
-    const update=await sql.query`INSERT INTO users(user_id,password) VALUES(${uname},${password})`;
-})
+// ✅ POST API to insert user
+app.post("/loginentry", async (req, res) => {
+  const { uname, password } = req.body;
 
+  if (!uname || !password) {
+    return res.status(400).json({ success: false, message: "Username and password required" });
+  }
 
-// Route for login check using dynamic data
+  try {
+    const result = await sql.query`
+      INSERT INTO users (user_id, password) 
+      VALUES (${uname}, ${password})`;
+
+    res.status(201).json({ success: true, message: "User inserted successfully" });
+  } catch (err) {
+    console.error("❌ Error inserting user:", err);
+    res.status(500).json({ success: false, message: "Database error" });
+  }
+});
+
+// ✅ GET API to check login (static for now)
 app.get('/login', async (req, res) => {
-  const user_id="balaji"
+  const user_id = "balaji";
   const password = "password";
 
   if (!user_id || !password) {
@@ -38,7 +56,6 @@ app.get('/login', async (req, res) => {
   }
 
   try {
-    await sql.connect(config);
     const result = await sql.query`
       SELECT * FROM users 
       WHERE user_id = ${user_id} AND password = ${password}
@@ -50,12 +67,12 @@ app.get('/login', async (req, res) => {
       res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
   } catch (err) {
-    console.error('SQL error', err);
+    console.error('❌ SQL error', err);
     res.status(500).json({ success: false, message: 'Database error' });
   }
 });
 
-// Server listener
+// Start server
 app.listen(port, () => {
   console.log(`✅ Server running on port ${port}`);
 });

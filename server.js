@@ -24,7 +24,7 @@ const config = {
 
 app.post("/loginentry",async(req,res)=>{
     const {uname,password}=req.body;
-    const update=await sql.query`INSERT INTO users(email,database) VALUES(${uname},${password})`;
+    const update=await sql.query`INSERT INTO users(user_id,password) VALUES(${uname},${password})`;
 })
 
 

@@ -4,15 +4,14 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-  "build": "npm rebuild odbc && npm install",
-  "start": "node server.js"
-},
-
+    "build": "npm rebuild odbc && npm install",
+    "start": "node server.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^5.1.0",
-    "odbc": "^2.4.9"
+    "mssql": "^11.0.1"
   }
 }

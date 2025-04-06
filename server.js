@@ -1,28 +1,38 @@
-const express = require("express");
-const odbc = require("odbc");
-require("dotenv").config();
+// server.js
+const express = require('express');
+const sql = require('mssql');
+const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-const connectionString = `Driver={ODBC Driver 18 for SQL Server};Server=tcp:sanchari.database.windows.net,1433;Database=Users;Uid=root1;Pwd=Nbalaji@2004;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;`;
+app.use(cors());
+app.use(express.json());
 
-app.get("/users", async (req, res) => {
+// Azure SQL config
+const config = {
+  user: 'root1',
+  password: 'Nbalaji@2004',
+  server: 'sanchari.database.windows.net',
+  database: 'Users',
+  options: {
+    encrypt: true, // Required for Azure
+    trustServerCertificate: false,
+  },
+};
+
+// Route to test database connection
+app.get('/users', async (req, res) => {
   try {
-    const connection = await odbc.connect(connectionString);
-    const result = await connection.query("SELECT * FROM users");
-    await connection.close();
-    res.json(result);
+    await sql.connect(config);
+    const result = await sql.query`SELECT * FROM your_table_name`; // Replace with your actual table
+    res.json(result.recordset);
   } catch (err) {
-    console.error("Database error:", err);
-    res.status(500).send("Something went wrong.");
+    console.error('SQL error', err);
+    res.status(500).send('Database error');
   }
 });
 
-app.get("/",(req,res)=>{
-    res.send("Your Website is working fine.")
-})
-
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`✅ Server running on port ${port}`);
 });

@@ -48,8 +48,7 @@ app.post("/signup", async (req,res)=>{
     const signup=await sql.query`INSERT INTO ALLUSERS(Name,Email,Password,CnfPassword) VALUES(${name},${uname},${pw},${cpw})`
     console.log(`Added New User :${name} and ${uname}`)
   } catch (error) {
-    console.log("Error Inserting User");
-    
+    console.log("Error Inserting User",err);
   }
   
 })

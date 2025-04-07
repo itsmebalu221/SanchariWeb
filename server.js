@@ -42,6 +42,18 @@ app.post("/loginentry", async (req, res) => {
   }
 });
 
+app.post("/signup", async (req,res)=>{
+  try {
+    const {name,uname,pw,cpw}=req.body;
+    const signup=await sql.query`INSERT INTO ALLUSERS(Name,Email,Password,CnfPassword) VALUES(${name},${uname},${pw},${cpw})`
+    console.log(`Added New User :${name} and ${uname}`)
+  } catch (error) {
+    console.log("Error Inserting User");
+    
+  }
+  
+})
+
 // ✅ GET API to check login (static for now)
 app.get('/login', async (req, res) => {
   const user_id = "balaji";

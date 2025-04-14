@@ -9,6 +9,7 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+app.use('/public',express.static(__dirname+"/public"))
 // Azure SQL config
 const config = {
   user: 'root1',
@@ -53,6 +54,25 @@ app.post("/signup", async (req,res)=>{
   
 })
 
+app.get("/nearst",async(req,res)=>{
+  const nearst=await sql.query`DECLARE @userLocation GEOGRAPHY = geography::Point(17.389269, 78.500868, 4326);
+
+SELECT SNO ,PLACE_NAME,
+       Location.STDistance(@userLocation) AS DistanceInMeters
+FROM Places
+WHERE Location.STDistance(@userLocation) <= 5000;`
+  res.status(200).json({message:"sucess",places:nearst.recordset})
+})
+
+app.get("/placesMain",async(req,res)=>{
+  const places=await sql.query`SELECT PlaceName,State FROM PlacesMain`
+  res.status(200).send(places.recordset)
+})
+
+app.get("/home",(req,res)=>{
+
+  res.sendFile(__dirname+"/index.html")
+})
 // ✅ GET API to check login (static for now)
 app.get('/login', async (req, res) => {
   const user_id = "balaji";
@@ -80,6 +100,6 @@ app.get('/login', async (req, res) => {
 });
 
 // Start server
-app.listen(port,'0.0.0.0', () => {
+app.listen(port, () => {
   console.log(`✅ Server running on port ${port}`);
 });

@@ -65,8 +65,13 @@ WHERE Location.STDistance(@userLocation) <= 5000;`
 })
 
 app.get("/placesMain",async(req,res)=>{
-  const places=await sql.query`SELECT PlaceName,State FROM PlacesMain`
-  res.status(200).send(places.recordset)
+  try{
+    const places=await sql.query`SELECT PlaceName,State FROM PlacesMain`
+    res.status(200).send(places.recordset)
+  }catch(err){
+    console.log(err)
+  }
+  
 })
 
 app.get("/home",(req,res)=>{

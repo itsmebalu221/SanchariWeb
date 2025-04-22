@@ -2,6 +2,7 @@
 const express = require('express');
 const sql = require('mssql');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -10,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/public',express.static(__dirname+"/public"))
+
 // Azure SQL config
 const config = {
   user: 'root1',
@@ -74,9 +76,21 @@ app.get("/placesMain",async(req,res)=>{
   
 })
 
+app.get("/images/:imgName", (req, res) => {
+  const imgName = req.params.imgName;
+  const imgPath = path.join(__dirname, 'images', imgName);
+
+  res.sendFile(imgPath, (err) => {
+    if (err) {
+      console.error("Error sending file:", err);
+      res.status(404).send("Image not found");
+    }
+  });
+});
+
 app.get("/home",(req,res)=>{
 
-  res.sendFile(__dirname+"/index.html")
+  res.sendFile(__dirname+"/image.png")
 })
 // ✅ GET API to check login (static for now)
 app.get('/login', async (req, res) => {

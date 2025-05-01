@@ -76,6 +76,17 @@ app.get("/placesMain",async(req,res)=>{
   
 })
 
+app.get("/placesMain",async(req,res)=>{
+  const placeName=req.body.placeName;
+  try{
+    const places=await sql.query`SELECT * FROM PlacesMain WHERE PlaceName="${placeName}"`
+    res.status(200).send(placeMain.recordset)
+  }catch(err){
+    console.log(err)
+  }
+  
+})
+
 app.get("/images/:imgName", (req, res) => {
   const imgName = req.params.imgName;
   const imgPath = path.join(__dirname, 'images', imgName);

@@ -76,8 +76,8 @@ app.get("/placesMain",async(req,res)=>{
   
 })
 
-app.post("/placesMain",async(req,res)=>{
-  const placeName=req.body.placeName;
+app.get("/placesMain/:placeName",async(req,res)=>{
+  const placeName=req.params.placeName;
   try{
     const places=await sql.query`SELECT * FROM PlacesMain WHERE PlaceName="${placeName}"`
     res.status(200).send(placeMain.recordset)

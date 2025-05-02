@@ -79,7 +79,7 @@ app.get("/placesMain",async(req,res)=>{
 app.get("/placesMain/:placeName",async(req,res)=>{
   const placeName=req.params.placeName;
   try{
-    const places=await sql.query`SELECT * FROM PlacesMain WHERE PlaceName=${placeName}`
+    const places=await sql.query`SELECT * FROM PlacesMain WHERE PlaceID=${placeName}`
     res.status(200).send(places.recordset[0])
   }catch(err){
     console.log(err)

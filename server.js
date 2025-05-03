@@ -111,7 +111,7 @@ app.get("/ttd/:id", async (req, res) => {
     if (result.recordset.length === 0) {
       return res.status(404).send("Data Not Found");
     }
-    res.status(200).send(result.recordset[0]);
+    res.status(200).send(result.recordset);
   } catch (err) {
     console.error("Error fetching data:", err);
     res.status(500).send("Internal Server Error");

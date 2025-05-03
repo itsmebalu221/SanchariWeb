@@ -3,12 +3,17 @@ const express = require('express');
 const sql = require('mssql');
 const cors = require('cors');
 const path = require('path');
+const bodyParser=require('body-parser');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+app.use(bodyParser.json()); // handles JSON
+app.use(bodyParser.urlencoded({ extended: true })); // handles form data
+
 
 app.use('/public',express.static(__dirname+"/public"))
 
@@ -98,6 +103,18 @@ app.get("/images/:imgName", (req, res) => {
     }
   });
 });
+
+app.get("/ttd/:id",async(req,res)=>{
+  try{
+    const id=req.params.id;
+    const res=await sql.query`SELECT * FROM ThingsToDo WHERE PlaceID=${id}`
+    res.status(200).send(res.recordset[0])
+  }catch{
+    console.log("No data found")
+    res.status(404).send("Data Not Found")
+  }
+  
+})
 
 app.get("/home",(req,res)=>{
 

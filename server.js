@@ -105,8 +105,8 @@ app.get("/images/:imgName", (req, res) => {
 });
 
 app.get("/ttd/:id",async(req,res)=>{
+  const id=req.params.id;
   try{
-    const id=req.params.id;
     const res=await sql.query`SELECT * FROM ThingsToDo WHERE PlaceID=${id}`
     res.status(200).send(res.recordset[0])
   }catch{

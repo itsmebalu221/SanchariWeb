@@ -104,17 +104,19 @@ app.get("/images/:imgName", (req, res) => {
   });
 });
 
-app.get("/ttd/:id",async(req,res)=>{
-  const id=req.params.id;
-  try{
-    const res=await sql.query`SELECT * FROM ThingsToDo WHERE PlaceID=${id}`
-    res.status(200).send(res.recordset[0])
-  }catch{
-    console.log("No data found")
-    res.status(404).send("Data Not Found")
+app.get("/ttd/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await sql.query`SELECT * FROM ThingsToDo WHERE PlaceID=${id}`;
+    if (result.recordset.length === 0) {
+      return res.status(404).send("Data Not Found");
+    }
+    res.status(200).send(result.recordset[0]);
+  } catch (err) {
+    console.error("Error fetching data:", err);
+    res.status(500).send("Internal Server Error");
   }
-  
-})
+});
 
 app.get("/home",(req,res)=>{
 

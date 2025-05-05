@@ -113,7 +113,7 @@ app.get("/ttd/:id", async (req, res) => {
     }
     res.status(200).send(result.recordset);
   } catch (err) {
-    console.error("Error fetching data:", err);
+    console.error("Error fetching  data:", err);
     res.status(500).send("Internal Server Error");
   }
 });

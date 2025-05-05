@@ -107,7 +107,7 @@ app.get("/images/:imgName", (req, res) => {
 app.get("/ttd/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    const result = await sql.query`SELECT * FROM ThingsToDo WHERE PlaceID=${id}`;
+    const result = await sql.query`SELECT Activity FROM ThingsToDo WHERE PlaceID=${id}`;
     if (result.recordset.length === 0) {
       return res.status(404).send("Data Not Found");
     }

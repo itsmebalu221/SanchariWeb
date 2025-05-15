@@ -4,6 +4,9 @@ const sql = require('mssql');
 const cors = require('cors');
 const path = require('path');
 const bodyParser=require('body-parser');
+const multer = require("multer");
+const csv = require("csv-parser");
+const fs = require("fs");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -146,6 +149,76 @@ app.get('/login', async (req, res) => {
     console.error('❌ SQL error', err);
     res.status(500).json({ success: false, message: 'Database error' });
   }
+});
+
+
+// Function to generate random 5-char string for table name
+function generateRandomTableName(length = 5) {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for(let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+app.post('/upload-csv', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No file uploaded.');
+  }
+
+  const results = [];
+  const tableName = generateRandomTableName();
+
+  fs.createReadStream(req.file.path)
+    .pipe(csv())
+    .on('data', (data) => results.push(data))
+    .on('end', async () => {
+      try {
+        const pool = await sql.connect(config);
+
+        // Create table with the structure matching the CSV columns
+        const createTableQuery = `
+          CREATE TABLE [${tableName}] (
+            id INT IDENTITY(1,1) PRIMARY KEY,
+            timestamp DATETIME,
+            log_level VARCHAR(10),
+            source VARCHAR(50),
+            message TEXT,
+            user_id INT,
+            ip_address VARCHAR(50),
+            status_code INT
+          )
+        `;
+
+        await pool.request().query(createTableQuery);
+
+        // Insert CSV rows into the newly created table
+        for (const log of results) {
+          await pool.request()
+            .input('timestamp', sql.DateTime, new Date(log.timestamp))
+            .input('log_level', sql.VarChar(10), log.log_level)
+            .input('source', sql.VarChar(50), log.source)
+            .input('message', sql.Text, log.message)
+            .input('user_id', sql.Int, parseInt(log.user_id) || null)
+            .input('ip_address', sql.VarChar(50), log.ip_address)
+            .input('status_code', sql.Int, parseInt(log.status_code) || null)
+            .query(`
+              INSERT INTO [${tableName}]
+              (timestamp, log_level, source, message, user_id, ip_address, status_code)
+              VALUES (@timestamp, @log_level, @source, @message, @user_id, @ip_address, @status_code)
+            `);
+        }
+
+        // Remove uploaded file after processing
+        fs.unlinkSync(req.file.path);
+
+        res.status(200).send(`Table '${tableName}' created and inserted ${results.length} records successfully.`);
+      } catch (err) {
+        console.error('❌ Error:', err);
+        res.status(500).send('Error creating table or inserting data.');
+      }
+    });
 });
 
 // Start server

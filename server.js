@@ -222,6 +222,13 @@ app.post('/upload-csv', upload.single('file'), (req, res) => {
     });
 });
 
+app.get('/getIPS',async (req,res)=>{
+  const results=await sql.query`Select  ip_address from NBdgN`;
+  if(results.recordset.length>0){
+    res.status(200).json({results:results.recordset})
+  }
+})
+
 // Start server
 app.listen(port,"0.0.0.0", () => {
   console.log(`✅ Server running on port ${port}`);

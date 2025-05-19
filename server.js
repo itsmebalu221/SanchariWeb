@@ -222,12 +222,24 @@ app.post('/upload-csv', upload.single('file'), (req, res) => {
     });
 });
 
-app.get('/getIPS',async (req,res)=>{
-  const results=await sql.query`Select  ip_address from NBdgN`;
-  if(results.recordset.length>0){
-    res.status(200).json({results:results.recordset})
-  }
-})
+app.post('/MoneyRequest', (req, res) => {
+  const { requestFrom, requestedBy, amount, note, ipAddress, timestamp } = req.body;
+
+  const query = `
+    INSERT INTO MoneyRequests 
+    (requestFrom, requestedBy, amount, note, ipAddress, timestamp)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(query, [requestFrom, requestedBy, amount, note, ipAddress, timestamp], (err, result) => {
+    if (err) {
+      console.error('❌ Error inserting data:', err.message);
+      return res.status(500).json({ success: false, message: 'Database insert failed' });
+    }
+
+    res.status(200).json({ success: true, message: 'Money request saved successfully' });
+  });
+});
 
 // Start server
 app.listen(port,"0.0.0.0", () => {
